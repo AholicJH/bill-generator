@@ -128,21 +128,24 @@ dom.saveImageBtn.addEventListener("click", async () => {
     const name = dom.inputName.value.trim() || "账单详情";
     const fileName = `${name}-账单.png`;
     const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
-    const imageFile = new File([blob], fileName, { type: "image/png" });
-    const canShareImage = navigator.share && navigator.canShare && navigator.canShare({ files: [imageFile] });
+    const imageUrl = URL.createObjectURL(blob);
+    const isMobile = window.matchMedia("(max-width: 760px)").matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    if (canShareImage) {
-      await navigator.share({
-        files: [imageFile],
-        title: "账单图片"
-      });
-      dom.saveImageBtn.textContent = "请在分享面板中保存";
+    if (isMobile) {
+      // 手机浏览器直接展示原图，用户可长按选择“存储到照片/保存到相册”。
+      const preview = document.createElement("a");
+      preview.href = imageUrl;
+      preview.target = "_blank";
+      preview.rel = "noopener";
+      preview.click();
+      dom.saveImageBtn.textContent = "请长按图片保存到相册";
+      setTimeout(() => URL.revokeObjectURL(imageUrl), 60000);
     } else {
       const link = document.createElement("a");
       link.download = fileName;
-      link.href = URL.createObjectURL(blob);
+      link.href = imageUrl;
       link.click();
-      URL.revokeObjectURL(link.href);
+      setTimeout(() => URL.revokeObjectURL(imageUrl), 1000);
       dom.saveImageBtn.textContent = "已下载账单图片";
     }
 
