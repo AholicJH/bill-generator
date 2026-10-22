@@ -188,6 +188,22 @@
     </main>
   </div>
 
+  <div class="image-preview-modal" id="imagePreviewModal" aria-hidden="true">
+    <div class="image-preview-backdrop" data-close-preview></div>
+    <section class="image-preview-panel" role="dialog" aria-modal="true" aria-label="账单图片预览">
+      <div class="image-preview-toolbar">
+        <div>
+          <strong>账单图片</strong>
+          <span>长按图片保存到相册</span>
+        </div>
+        <button class="preview-close" type="button" data-close-preview aria-label="关闭图片预览">×</button>
+      </div>
+      <div class="image-preview-content">
+        <img id="savedBillImage" alt="生成的账单图片" />
+      </div>
+    </section>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="script.js"></script>
 </body>

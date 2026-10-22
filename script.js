@@ -25,6 +25,8 @@ function formatCurrency(amount) {
 const dom = {
   randomBtn: document.getElementById("randomBtn"),
   saveImageBtn: document.getElementById("saveImageBtn"),
+  imagePreviewModal: document.getElementById("imagePreviewModal"),
+  savedBillImage: document.getElementById("savedBillImage"),
   // 输入表单
   inputName: document.getElementById("inputName"),
   inputAmount: document.getElementById("inputAmount"),
@@ -132,14 +134,11 @@ dom.saveImageBtn.addEventListener("click", async () => {
     const isMobile = window.matchMedia("(max-width: 760px)").matches || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // 手机浏览器直接展示原图，用户可长按选择“存储到照片/保存到相册”。
-      const preview = document.createElement("a");
-      preview.href = imageUrl;
-      preview.target = "_blank";
-      preview.rel = "noopener";
-      preview.click();
+      // 页面内展示原图，避免手机浏览器拦截新标签页。
+      dom.savedBillImage.src = imageUrl;
+      dom.imagePreviewModal.classList.add("is-open");
+      dom.imagePreviewModal.setAttribute("aria-hidden", "false");
       dom.saveImageBtn.textContent = "请长按图片保存到相册";
-      setTimeout(() => URL.revokeObjectURL(imageUrl), 60000);
     } else {
       const link = document.createElement("a");
       link.download = fileName;
@@ -161,6 +160,14 @@ dom.saveImageBtn.addEventListener("click", async () => {
       dom.saveImageBtn.disabled = false;
     }, 1600);
   }
+});
+
+document.querySelectorAll("[data-close-preview]").forEach(element => {
+  element.addEventListener("click", () => {
+    dom.imagePreviewModal.classList.remove("is-open");
+    dom.imagePreviewModal.setAttribute("aria-hidden", "true");
+    dom.savedBillImage.removeAttribute("src");
+  });
 });
 
 // 输入框实时响应联动
