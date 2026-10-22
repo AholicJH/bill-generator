@@ -125,12 +125,27 @@ dom.saveImageBtn.addEventListener("click", async () => {
       useCORS: true,
       logging: false
     });
-    const link = document.createElement("a");
     const name = dom.inputName.value.trim() || "账单详情";
-    link.download = `${name}-账单.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-    dom.saveImageBtn.textContent = "已保存到账单图片";
+    const fileName = `${name}-账单.png`;
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    const imageFile = new File([blob], fileName, { type: "image/png" });
+    const canShareImage = navigator.share && navigator.canShare && navigator.canShare({ files: [imageFile] });
+
+    if (canShareImage) {
+      await navigator.share({
+        files: [imageFile],
+        title: "账单图片"
+      });
+      dom.saveImageBtn.textContent = "请在分享面板中保存";
+    } else {
+      const link = document.createElement("a");
+      link.download = fileName;
+      link.href = URL.createObjectURL(blob);
+      link.click();
+      URL.revokeObjectURL(link.href);
+      dom.saveImageBtn.textContent = "已下载账单图片";
+    }
+
     setTimeout(() => {
       dom.saveImageBtn.innerHTML = originalText;
       dom.saveImageBtn.disabled = false;
